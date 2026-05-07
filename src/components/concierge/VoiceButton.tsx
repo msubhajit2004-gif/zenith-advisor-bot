@@ -1,82 +1,76 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Loader2 } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 
 type Props = {
-  onTranscript: (text: string) => void;
+  onPartial: (text: string) => void;
+  onFinal: (text: string) => void;
 };
 
-export function VoiceButton({ onTranscript }: Props) {
+export function VoiceButton({ onPartial, onFinal }: Props) {
   const [active, setActive] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [scribe, setScribe] = useState<any>(null);
+  const recRef = useRef<any>(null);
 
-  const stop = useCallback(async () => {
-    if (scribe) {
+  useEffect(() => {
+    return () => {
       try {
-        await scribe.disconnect();
+        recRef.current?.stop();
       } catch {}
-    }
-    setScribe(null);
-    setActive(false);
-  }, [scribe]);
+    };
+  }, []);
 
-  const start = useCallback(async () => {
-    setLoading(true);
-    try {
-      const tokenRes = await fetch("/api/scribe-token", { method: "POST" });
-      if (!tokenRes.ok) {
-        throw new Error(
-          tokenRes.status === 503
-            ? "Voice not configured. Add ELEVENLABS_API_KEY to enable."
-            : "Could not start voice",
-        );
-      }
-      const { token } = await tokenRes.json();
-
-      const mod = await import("@elevenlabs/react");
-      // useScribe is a hook; we need the imperative client. Fall back to dynamic Conversation API
-      // The package also exports a low-level client; simplest is Web Speech if SDK unavailable here.
-      // Use the SDK's plain client:
-      // @ts-ignore - runtime import
-      const { ScribeClient } = mod as any;
-      if (!ScribeClient) {
-        throw new Error("Voice SDK unavailable");
-      }
-      const client = new ScribeClient({
-        modelId: "scribe_v2_realtime",
-        commitStrategy: "vad",
-        onCommittedTranscript: (data: any) => {
-          if (data?.text) onTranscript(data.text);
-        },
-      });
-      await client.connect({ token, microphone: { echoCancellation: true, noiseSuppression: true } });
-      setScribe(client);
-      setActive(true);
-    } catch (e: any) {
-      toast.error(e?.message ?? "Voice unavailable");
-    } finally {
-      setLoading(false);
+  const toggle = useCallback(() => {
+    if (active) {
+      try {
+        recRef.current?.stop();
+      } catch {}
+      setActive(false);
+      return;
     }
-  }, [onTranscript]);
+    const SR =
+      (typeof window !== "undefined" &&
+        ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)) ||
+      null;
+    if (!SR) {
+      toast.error("Voice input not supported in this browser. Try Chrome.");
+      return;
+    }
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = "en-US";
+    rec.onresult = (e: any) => {
+      let interim = "";
+      let finalTxt = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) finalTxt += r[0].transcript;
+        else interim += r[0].transcript;
+      }
+      if (interim) onPartial(interim);
+      if (finalTxt) onFinal(finalTxt.trim());
+    };
+    rec.onerror = (e: any) => {
+      toast.error(`Voice error: ${e.error}`);
+      setActive(false);
+    };
+    rec.onend = () => setActive(false);
+    rec.start();
+    recRef.current = rec;
+    setActive(true);
+  }, [active, onPartial, onFinal]);
 
   return (
     <Button
       type="button"
       size="icon"
       variant={active ? "default" : "outline"}
-      onClick={active ? stop : start}
-      disabled={loading}
+      onClick={toggle}
       title="Voice input"
+      className={active ? "animate-pulse" : ""}
     >
-      {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : active ? (
-        <MicOff className="h-4 w-4" />
-      ) : (
-        <Mic className="h-4 w-4" />
-      )}
+      {active ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
     </Button>
   );
 }
