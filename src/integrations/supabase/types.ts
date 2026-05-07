@@ -14,7 +14,169 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cart_items: {
+        Row: {
+          cart_id: string
+          created_at: string
+          id: string
+          product_id: string
+          qty: number
+        }
+        Insert: {
+          cart_id: string
+          created_at?: string
+          id?: string
+          product_id: string
+          qty?: number
+        }
+        Update: {
+          cart_id?: string
+          created_at?: string
+          id?: string
+          product_id?: string
+          qty?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "carts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carts: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          product_ids: string[]
+          reasoning: Json | null
+          role: string
+          session_id: string
+          tool_calls: Json | null
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          product_ids?: string[]
+          reasoning?: Json | null
+          role: string
+          session_id: string
+          tool_calls?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          product_ids?: string[]
+          reasoning?: Json | null
+          role?: string
+          session_id?: string
+          tool_calls?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string
+          cons: string[]
+          created_at: string
+          id: string
+          image_url: string | null
+          name: string
+          price_cents: number
+          pros: string[]
+          search_text: string
+          short_desc: string
+          specs: Json
+        }
+        Insert: {
+          category: string
+          cons?: string[]
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name: string
+          price_cents: number
+          pros?: string[]
+          search_text?: string
+          short_desc: string
+          specs?: Json
+        }
+        Update: {
+          category?: string
+          cons?: string[]
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          price_cents?: number
+          pros?: string[]
+          search_text?: string
+          short_desc?: string
+          specs?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
