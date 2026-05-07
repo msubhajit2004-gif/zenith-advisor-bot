@@ -1,26 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Concierge } from "@/components/concierge/Concierge";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Concierge — your AI shopping advisor" },
+      {
+        name: "description",
+        content:
+          "An agentic AI shopping concierge that uncovers your true intent, recommends 2–3 products with explicit trade-offs, and closes the loop to checkout.",
+      },
+    ],
+  }),
+  component: Concierge,
 });
-
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
-}
