@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "ai shopping agent" },
+      { name: "description", content: "Smart Shopper AI acts as an elite AI Shopping Concierge, guiding users through product discovery and purchase." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "ai shopping agent" },
+      { property: "og:description", content: "Smart Shopper AI acts as an elite AI Shopping Concierge, guiding users through product discovery and purchase." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "ai shopping agent" },
+      { name: "twitter:description", content: "Smart Shopper AI acts as an elite AI Shopping Concierge, guiding users through product discovery and purchase." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8b9f1317-f859-413a-9cfa-736acc4529c2/id-preview-c5ec80f1--b296cf16-3f63-40b5-bd4b-8234b34012f4.lovable.app-1778166849260.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8b9f1317-f859-413a-9cfa-736acc4529c2/id-preview-c5ec80f1--b296cf16-3f63-40b5-bd4b-8234b34012f4.lovable.app-1778166849260.png" },
     ],
     links: [
       {
